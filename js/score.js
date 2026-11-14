@@ -52,7 +52,7 @@ window.Score = (() => {
    * Render `comp` into `container`.
    * Returns { notes: Map(eventId -> [svg elements]), labels: Map(letterIndex -> [svg elements]) }.
    */
-  function render(container, comp, { onLetterClick, width } = {}) {
+  function render(container, comp, { onLetterClick, width, maxPerLine = 5 } = {}) {
     container.innerHTML = '';
     const W = Math.max(240, width || container.clientWidth);
     const avail = W - SIDE * 2;
@@ -71,7 +71,7 @@ window.Score = (() => {
     let cur = null;
     for (let m = 0; m < numMeasures; m++) {
       const lead = 46 + accCount * 11 + (lines.length === 0 ? 30 : 0);
-      if (!cur || cur.width + est[m] > avail || cur.measures.length >= 5) {
+      if (!cur || cur.width + est[m] > avail || cur.measures.length >= maxPerLine) {
         cur = { measures: [], width: lead, lead };
         lines.push(cur);
       }

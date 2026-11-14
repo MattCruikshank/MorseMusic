@@ -134,6 +134,17 @@ input:focus-visible, select:focus-visible, button:focus-visible {
   flex: none;
 }
 .print:hover { border-color: var(--accent); }
+.fit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  color: var(--muted);
+  cursor: pointer;
+  flex: none;
+  margin-left: -6px;
+}
+.fit input { accent-color: var(--accent); width: 16px; height: 16px; margin: 0; }
 .print svg { width: 20px; height: 20px; fill: currentColor; fill-rule: evenodd; }
 
 .morse-strip {

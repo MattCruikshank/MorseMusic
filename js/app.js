@@ -19,20 +19,22 @@
   fill($('pattern'), PATTERNS, v => v.label);
   fill($('rhythm'), RHYTHMS, v => v.label);
 
-  const FIELDS = ['text', 'instrument', 'key', 'scale', 'pattern', 'rhythm', 'timeSig', 'bpm'];
+  const FIELDS = ['text', 'instrument', 'key', 'scale', 'pattern', 'rhythm', 'timeSig', 'bpm', 'fit'];
   const DEFAULTS = { text: 'Matthew Cruikshank', instrument: 'flute', key: 'C', scale: 'pentatonic',
-    pattern: 'arpeggio', rhythm: 'strict', timeSig: '4', bpm: '96' };
+    pattern: 'arpeggio', rhythm: 'strict', timeSig: '4', bpm: '96', fit: '0' };
 
   // Load settings from the URL.
   const params = new URLSearchParams(location.search);
   FIELDS.forEach(f => {
     const v = params.get(f) ?? DEFAULTS[f];
     const input = $(f);
+    if (input.type === 'checkbox') { input.checked = v === '1'; return; }
     if (input.tagName === 'SELECT' && ![...input.options].some(o => o.value === v)) return;
     input.value = v;
   });
 
-  const settings = () => Object.fromEntries(FIELDS.map(f => [f, $(f).value]));
+  const valueOf = f => { const e = $(f); return e.type === 'checkbox' ? (e.checked ? '1' : '0') : e.value; };
+  const settings = () => Object.fromEntries(FIELDS.map(f => [f, valueOf(f)]));
 
   let comp = null;
   let rendered = null;
@@ -94,7 +96,7 @@
     });
   }
 
-  function renderScore(width) {
+  function renderScore(width, maxPerLine) {
     clearHighlight();
     const box = $('score');
     if (!comp.letters.length) {
@@ -102,7 +104,7 @@
       rendered = null;
       return;
     }
-    rendered = Score.render(box, comp, { onLetterClick: playFrom, width });
+    rendered = Score.render(box, comp, { onLetterClick: playFrom, width, maxPerLine });
     // Note names as tooltips.
     comp.melody.forEach(ev => {
       if (ev.rest) return;
@@ -196,19 +198,42 @@
 
   $('play').addEventListener('click', togglePlay);
 
-  // ---- Printing: lay the score out for a 7.5in-wide page (8.5in minus 0.5in margins). ----
-  const PRINT_WIDTH = 720;
+  // ---- Printing: lay the score out for a letter page with 0.5in margins (7.5in x 10in). ----
+  const PAGE_W = 720, PAGE_H = 960;
   let printing = false;
+
+  // "Fit to one page": try drawing the score wider (more measures per line,
+  // so fewer lines), then shrink the whole sheet to fit the page.  Keep the
+  // width that needs the least shrinking, so the notes stay as big as possible.
+  function renderToFitOnePage() {
+    if (!comp || !comp.letters.length) return 1;
+    const head = document.querySelector('.sheet-head').offsetHeight + 12;
+    let best = null;
+    for (let w = PAGE_W; w <= 2400; w += 80) {
+      renderScore(w, 12);
+      const h = head + $('score').offsetHeight;
+      const s = Math.min(1, PAGE_W / w, (PAGE_H - 16) / h);
+      if (!best || s > best.s + 0.001) best = { w, s };
+      if (h <= PAGE_H - 16) break; // already fits; wider would only shrink it
+    }
+    renderScore(best.w, 12);
+    return best.s;
+  }
+
   window.addEventListener('beforeprint', () => {
     if (printing) return;
     printing = true;
     Player.stop();
-    renderScore(PRINT_WIDTH);
+    const sheet = document.querySelector('.sheet');
+    if ($('fit').checked) sheet.style.zoom = renderToFitOnePage();
+    else { sheet.style.zoom = ''; renderScore(PAGE_W); }
   });
   window.addEventListener('afterprint', () => {
     printing = false;
+    document.querySelector('.sheet').style.zoom = '';
     renderScore();
   });
+  $('fit').addEventListener('change', () => saveToUrl(settings()));
   $('print').addEventListener('click', () => window.print());
   document.addEventListener('keydown', e => {
     if (e.code === 'Space' && !/INPUT|SELECT|BUTTON|TEXTAREA/.test(document.activeElement.tagName)) {
