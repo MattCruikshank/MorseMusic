@@ -52,9 +52,9 @@ window.Score = (() => {
    * Render `comp` into `container`.
    * Returns { notes: Map(eventId -> [svg elements]), labels: Map(letterIndex -> [svg elements]) }.
    */
-  function render(container, comp, { onLetterClick } = {}) {
+  function render(container, comp, { onLetterClick, width } = {}) {
     container.innerHTML = '';
-    const W = Math.max(240, container.clientWidth);
+    const W = Math.max(240, width || container.clientWidth);
     const avail = W - SIDE * 2;
     const clefs = comp.inst.clefs;
     const staffMeasures = [comp.melodyMeasures, comp.bassMeasures].slice(0, clefs.length);

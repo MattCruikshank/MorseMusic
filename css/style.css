@@ -120,6 +120,22 @@ input:focus-visible, select:focus-visible, button:focus-visible {
 .play.is-playing .icon-stop { display: inline; }
 .play.is-playing .icon-play { display: none; }
 
+.print {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: 600 0.95rem var(--sans);
+  color: var(--ink);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 9px 16px 9px 12px;
+  cursor: pointer;
+  flex: none;
+}
+.print:hover { border-color: var(--accent); }
+.print svg { width: 20px; height: 20px; fill: currentColor; fill-rule: evenodd; }
+
 .morse-strip {
   display: flex;
   flex-wrap: wrap;
@@ -195,3 +211,18 @@ input:focus-visible, select:focus-visible, button:focus-visible {
 .explain h3 { margin: 0 0 4px; font: 600 1.05rem var(--serif); }
 .explain p { margin: 0; color: var(--muted); font-size: 0.95rem; }
 .hint { color: var(--muted); font-size: 0.85rem; margin: 18px 0 40px; }
+
+/* ---------- Print: just the sheet music, black on white ---------- */
+@page { size: letter; margin: 0.5in; }
+@media print {
+  :root { color-scheme: light; }
+  body { background: #fff; color: #000; }
+  .masthead, .controls, .transport, .explain, .hint, .warning { display: none !important; }
+  main { max-width: none; padding: 0; }
+  .sheet { background: #fff; box-shadow: none; border-radius: 0; padding: 0; }
+  .sheet-head h2, .sheet-sub { color: #000; }
+  .score-line { break-inside: avoid; page-break-inside: avoid; }
+  .letter-label .letter-text { fill: #000; }
+  .letter-label .morse-sym { fill: #555; }
+  .letter-label .bracket { stroke: #999; }
+}

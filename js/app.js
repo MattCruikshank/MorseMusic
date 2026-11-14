@@ -94,7 +94,7 @@
     });
   }
 
-  function renderScore() {
+  function renderScore(width) {
     clearHighlight();
     const box = $('score');
     if (!comp.letters.length) {
@@ -102,7 +102,7 @@
       rendered = null;
       return;
     }
-    rendered = Score.render(box, comp, { onLetterClick: playFrom });
+    rendered = Score.render(box, comp, { onLetterClick: playFrom, width });
     // Note names as tooltips.
     comp.melody.forEach(ev => {
       if (ev.rest) return;
@@ -195,6 +195,21 @@
   }
 
   $('play').addEventListener('click', togglePlay);
+
+  // ---- Printing: lay the score out for a 7.5in-wide page (8.5in minus 0.5in margins). ----
+  const PRINT_WIDTH = 720;
+  let printing = false;
+  window.addEventListener('beforeprint', () => {
+    if (printing) return;
+    printing = true;
+    Player.stop();
+    renderScore(PRINT_WIDTH);
+  });
+  window.addEventListener('afterprint', () => {
+    printing = false;
+    renderScore();
+  });
+  $('print').addEventListener('click', () => window.print());
   document.addEventListener('keydown', e => {
     if (e.code === 'Space' && !/INPUT|SELECT|BUTTON|TEXTAREA/.test(document.activeElement.tagName)) {
       e.preventDefault();
@@ -216,7 +231,7 @@
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
       const w = $('score').clientWidth;
-      if (comp && w !== lastWidth) { lastWidth = w; renderScore(); }
+      if (comp && !printing && w !== lastWidth) { lastWidth = w; renderScore(); }
     }, 150);
   });
 
