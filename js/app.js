@@ -21,7 +21,7 @@
 
   const FIELDS = ['text', 'instrument', 'key', 'scale', 'pattern', 'rhythm', 'timeSig', 'bpm'];
   const DEFAULTS = { text: 'Matthew Cruikshank', instrument: 'flute', key: 'C', scale: 'full',
-    pattern: 'arpeggio', rhythm: 'musical', timeSig: '4', bpm: '96' };
+    pattern: 'arpeggio', rhythm: 'strict', timeSig: '4', bpm: '96' };
 
   // Load settings from the URL.
   const params = new URLSearchParams(location.search);
