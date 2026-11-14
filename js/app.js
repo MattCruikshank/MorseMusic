@@ -20,7 +20,7 @@
   fill($('rhythm'), RHYTHMS, v => v.label);
 
   const FIELDS = ['text', 'instrument', 'key', 'scale', 'pattern', 'rhythm', 'timeSig', 'bpm'];
-  const DEFAULTS = { text: 'Matthew Cruikshank', instrument: 'piano', key: 'C', scale: 'full',
+  const DEFAULTS = { text: 'Matthew Cruikshank', instrument: 'flute', key: 'C', scale: 'full',
     pattern: 'arpeggio', rhythm: 'musical', timeSig: '4', bpm: '96' };
 
   // Load settings from the URL.
